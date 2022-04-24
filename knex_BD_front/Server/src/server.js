@@ -1,0 +1,33 @@
+const express = require('express');
+const routes = require('./routes');
+const cors = require('cors');
+
+const app = express();
+
+app.use(express.json());
+
+app.use((req, res, next) => {
+    //console.log("Acessou o Middleware!");
+    res.header("Access-Control-Allow-Origin", "*");
+    res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE");
+    res.header("Access-Control-Allow-Headers", "*");
+    app.use(cors());
+    next();
+});
+
+app.use(routes)
+
+//not found
+app.use((req, res, next) => {
+    const error = new Error('Not Found')
+    error.status = 404
+    next(error)
+})
+
+//catch all 
+app.use((error, req, res, next) => {
+    res.status(error.status || 500)
+    res.json({error: error.message})
+})
+
+app.listen(3003, () => console.log('Server is running'))
